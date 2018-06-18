@@ -1,14 +1,9 @@
-# **Traffic Sign Recognition** 
+# **Traffic Sign Recognition Project** 
 
-## Writeup
-
-### You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Build a Traffic Sign Recognition Project**
+## Project Overview
 
 The goals / steps of this project are the following:
+
 * Load the data set (see below for links to the project data set)
 * Explore, summarize and visualize the data set
 * Design, train and test a model architecture
@@ -19,11 +14,13 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/visualization.jpg "Visualization"
-[image2]: ./examples/grayscale.jpg "Grayscaling"
-[image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
+[image1]: ./PictureExploreTrafSign.png "Picture Visualization"
+[image2]: ./HistogramTrafData.png "Histogram Visualization" 
+
+[image3]: ./OrigImagePreProc.png "Image before pre-processing"
+[image4]: ./StartPreProcessing.png "First pre-processing attemp"
+[image5]: ./FinalPreProcessing.png "Final pre-processing"
+
 [image6]: ./examples/placeholder.png "Traffic Sign 3"
 [image7]: ./examples/placeholder.png "Traffic Sign 4"
 [image8]: ./examples/placeholder.png "Traffic Sign 5"
@@ -36,7 +33,7 @@ The goals / steps of this project are the following:
 
 #### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one. You can submit your writeup as markdown or pdf. You can use this template as a guide for writing the report. The submission includes the project code.
 
-You're reading it! and here is a link to my [project code](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb)
+You're reading it! and here is a link to my [project code](https://github.com/Inquisitive-ME/Traffic_Sign_Classifier/blob/master/Traffic_Sign_Classifier.ipynb)
 
 ### Data Set Summary & Exploration
 
@@ -45,37 +42,71 @@ You're reading it! and here is a link to my [project code](https://github.com/ud
 I used the pandas library to calculate summary statistics of the traffic
 signs data set:
 
-* The size of training set is ?
-* The size of the validation set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
+* 34799 training examples
+* 4410 validation examples
+* 12630 testing examples
+* The Image data shape is 32 x 32
+* The number of unique classes/labels in the data set is 43
 
 #### 2. Include an exploratory visualization of the dataset.
 
-Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
+I did two exploratory visualizations of the dataset. The first is a picture for each unique label in the dataset. This gives a good visual of the quality and type of images in the dataset and can be seen below
 
 ![alt text][image1]
 
-### Design and Test a Model Architecture
-
-#### 1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
-
-As a first step, I decided to convert the images to grayscale because ...
-
-Here is an example of a traffic sign image before and after grayscaling.
-
+The second is a histogram of the dataset labels. This shows that we do not have equal data for each class which could cause issues when training the neural network.
 ![alt text][image2]
 
-As a last step, I normalized the image data because ...
 
-I decided to generate additional data because ... 
+### Design and Test a Model Architecture
 
-To add more data to the the data set, I used the following techniques because ... 
+#### I started desiging and testing my model architecture with the objective of doing the least amount of preprocessing possible to get acceptable results. My thought was that I could modify the network architecture to make up for issues in the data rather than preprocessing the data
 
-Here is an example of an original image and an augmented image:
+#### 1.I started with the suggested data preprocessing of (pixel - 128)/128. With the LeNet Architecture from the Lenet lab. I started with a learning rate of 0.001, 5 epochs and a batch size of 128. I was able to get an accurcy of 0.907. Below is a picture of one of the signs before and after preprocessing.
 
+** Image Before Pre-Processing **
 ![alt text][image3]
+
+** Image After Initial Pre-Processing **
+![alt text][image4]
+
+
+#### 3. Next I wanted to try to keep the suggeted preprocessing and see if I could improve the network to get better results
+
+##### a.I started by increasing the width of the convolutional layers so I tried multiplied the width of the LeNet Architecture by 3 and carried it through all the layers. This increased by accuracy to 0.925
+
+##### b. Next I played around with adding a 1x1 convolution to the begining and adding an extra fully connected layer to the end, but I was not able to get any significant increase in the accuracy and my model training time was significantly increasing so I decided to keep LeNet Architecture and play with the layer sizes
+
+##### c. I found better resulte by decreasing layer size to the last fully connected layer
+
+#### I ended up being able to change the layer sizes of the LeNet network to get an accuracy of 0.951, below is a table with a high level of the different iterations I performed
+
+####2. Next I wanted to work with preprocessing the images more than just the (pixel-128)/128. It made since to me to scale the images so I decided to use (pixel - min(pixel))/(max(pixel)-min(pixel) which scales each pixel to an intensity of 0 to 1. This was able to get me to an accuracy of 0.961. below is a picture of one of the signs before and after the final preprocessing
+
+** Image Before Pre-Processing **
+![alt text][image3]
+
+** Image After Initial Pre-Processing **
+![alt text][image5]
+
+
+Finally I tried to scale the images to gray scale, but did not see any improvement
+
+
+| Trial Method	      		|    Accuracy Result	        					| 
+|:---------------------:|:---------------------------------------------:| 
+| Initial Data Preprocession (pixel - 128)/128 <br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.907	|
+| tripling width of convolutional layers          <br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.925	|
+| tripling width of convolutional layers again<br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.917	|
+| back to only triple width of LeNet with added 1x1 convolution at begining<br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.934	|
+|only triple width of LeNet with added 1x1 convolution at begining and extra fully connected layer<br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.928	|
+| triple width of LeNet with smaller layer size for fully connected layers<br> learning rate = 0.001 <br> epochs = 5 <br> batch size = 128 	| 0.944	|
+| triple width of LeNet with smaller layer size for fully connected layers<br> learning rate = 0.0005 <br> epochs = 20 <br> batch size = 64 	| 0.951	|
+
+tried adding 1x1 convolution and an extra fully connected layer, but it dind't seem to help and really slowed down the training time
+What I found was that the LeNET with extra convolutional width but then slimming down the fully connected layers before the final conversion was close to best and was much faster to train the trying to add additional layers, which didn't provide much benift
+
+
 
 The difference between the original data set and the augmented data set is the following ... 
 
@@ -84,23 +115,31 @@ The difference between the original data set and the augmented data set is the f
 
 My final model consisted of the following layers:
 
-| Layer         		|     Description	        					| 
+| Layer         				|     Description	        						| 
 |:---------------------:|:---------------------------------------------:| 
-| Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
-| RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
+| Input         				| 32x32x3 RGB image   							| 
+| Convolution 5x5    	 	| 1x1 stride, same padding, outputs 28x28x18 		|
+| RELU					|											|
+| Max pooling	      			| 2x2 stride,  outputs 14x14x18 					|
+| Convolution 5x5			|  1x1 stride, same padding, outputs 10x10x48     	|
+| RELU					|											|
+| Max pooling	      			| 2x2 stride,  outputs 5x5x48 					|
+| Flatten					| outputs 1200								|
+| Fully connected			| linear, outputs 360       						|
+| RELU					|											|
+| Fully connected			| linear, outputs 100	    						|
+| RELU					|											|
+| Fully connected			| linear, outputs 43		    						|
+
  
 
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
 
-To train the model, I used an ....
+I used a combination of my personal computer an an amazon web server instance type g2.2xlarge to train the model. The web server was about 5 times faster than my personal computer.
+
+I started with a learning rate of 0.001, 10 epochs and a batch size of 128. As I got better accuracy I started tuning these values to end up with a learning rate of 0.0005, 40 epochs and a batch size of 64.
+
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
@@ -169,3 +208,19 @@ For the second image ...
 #### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
 
 
+Future: looking back I feel that additinaly preprocessing would be necassary in order to get better results. This would have helped with the issues that the number of traning examples for each class are not even and we probably could have performed better from images from the internet. I think the issues with the internet images is that they are at very different angles. Using color also probalby did not help because now the lighting of the images could have an effect on the output
+Started with the Lenet traffic sign
+
+I had a lot of problems getting started, because I was going to start with the suggested preprocessing of (pixel - 128)/128. This turned out to not work very well and I thought I could train my model to make it better but changes in hyper parameters and network sizes did not help
+
+with the default got about 0.3
+
+just from using the mean to have mean zero and equal variance I had ~0.8 with standard LeNet
+
+I changed the preprocessing to normalize the pixels from 0 to 1 instead of 
+
+tried adding a layer and making the model larger,but o
+
+Played a lot with dimensions and adding a pre layer to extract more width from the colors but never really got above 0.93-0.95 accuracy so I think I was getting the most I could out of the data with the architecture
+
+seems very easy to get to 0.9 starting from Lenet but to ensure 0.93 I wanted to have 0.95 validation. The top out at 0.93 makes me think the data is limited, so I want to try to add additional pictures from the classes that have a small number of pictures
